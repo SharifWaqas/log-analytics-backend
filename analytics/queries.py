@@ -14,3 +14,13 @@ class AnalyticsService:
     def get_login_counts_per_user(self):
         return (self.db.get_counts_grouped_by_user("login"))
 
+    def get_error_rate(self):
+        total_logs = self.db.get_total_log_count()        
+        if total_logs == 0:
+            return None
+        else:
+            error_logs = self.db.get_error_log_count()
+            return (error_logs/total_logs)
+
+    def get_failed_login_counts_per_user(self):
+        return(self.db.get_failed_login_counts_per_user())
