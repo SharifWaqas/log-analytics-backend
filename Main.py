@@ -1,7 +1,8 @@
 from reader import file_reader
 from parser import log_parser
 from storage import sqlite_db
-from analytics import AnalyticsService
+from storage import postgres_db
+from analytics.queries import AnalyticsService
 import argparse
 
 
@@ -9,11 +10,9 @@ import argparse
 def run_ingestion(filepath, batchsize):
     totalcount = 0
     errors = 0
-    db = sqlite_db.SQLiteDB("logs.db")
+    db = postgres_db.PostgreSQLDB()
     valid_batch = []
     failed_batch = []
-    db.create_valid_logs_table()
-    db.create_failed_logs_table()
     logset = set()    
 
     data = file_reader.FileReader(filepath).read_file_lines(batchsize)
@@ -55,17 +54,17 @@ def handle_ingest(args):
         print(key,"     : ",value)
 
 def handle_top_users(args):
-    db = sqlite_db.SQLiteDB("logs.db")
+    db = postgres_db.PostgreSQLDB()
     analysis = AnalyticsService(db)
     user_count = analysis.get_login_counts_per_user()
     print("Top Users")
     print("---------")
     for i in user_count:
-        print(i[0] + " : " + str(i[1]))
+        print(str(i[0]) ,":", str(i[1]))
 
 
 def handle_error(args):
-    db = sqlite_db.SQLiteDB("logs.db")
+    db = postgres_db.PostgreSQLDB()
     analysis = AnalyticsService(db)
     error_rate = analysis.get_error_rate()
     if error_rate is None:
@@ -74,7 +73,7 @@ def handle_error(args):
         print(f"Error Rate: {error_rate*100:.2f}%")
 
 def handle_log_failures(args):
-    db = sqlite_db.SQLiteDB("logs.db")
+    db = postgres_db.PostgreSQLDB()
     analysis = AnalyticsService(db)
     results = analysis.get_failed_login_counts_per_user()
     if results :
