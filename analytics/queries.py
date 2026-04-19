@@ -11,8 +11,17 @@ class AnalyticsService:
         raw_logs = self.db.fetch_logs(starttime,endtime,"ERROR")
         return raw_logs
 
-    def get_login_counts_per_user(self, limit):
-        return (self.db.get_counts_grouped_by_user(("login"), limit))
+    def get_login_counts_per_user(self,limit, hours, service, status, order, offset):
+        char_hours = str(hours) + " hours"
+        temp = ["ASC", "DESC"]
+        if order is None:
+            validated_order = "DESC"
+        else:
+            if order.upper() not in temp:
+                validated_order = "DESC"
+            else:
+                validated_order = order.upper()
+        return self.db.get_counts_grouped_by_user("login",char_hours,service,status,validated_order,limit,offset)
 
     def get_error_rate(self):
         total_logs = self.db.get_total_log_count()        

@@ -63,16 +63,40 @@ class PostgreSQLDB:
         return rows
 
     
-    def get_counts_grouped_by_user(self, action, limit):
+    def get_counts_grouped_by_user(self, action, hours, service, status, order, limit, offset):
         query = """
-                SELECT user_id, COUNT(*) AS user_count
-                FROM valid_logs
-                WHERE action = %s
-                GROUP BY user_id
-                ORDER BY user_count DESC
-                LIMIT %s
-                """
-        self.cursor.execute(query, (action,limit))
-        returnval = self.cursor.fetchall()
-        return (returnval)
-    
+            SELECT user_id, COUNT(*) AS user_count
+            FROM valid_logs
+            WHERE action = %s
+            AND timestamp >= NOW() - (%s)::INTERVAL
+        """
+
+        params = [action, hours]
+
+        if service is not None:
+            query += " AND service = %s"
+            params.append(service)
+
+        if status is not None:
+            query += " AND status = %s"
+            params.append(status)
+        query += """
+        GROUP BY user_id    
+        """    
+        if order == "ASC":
+            query += """
+            ORDER BY user_count ASC, user_id ASC
+            """
+        else:
+            query += """
+            ORDER BY user_count DESC, user_id ASC
+            """
+        query += """ LIMIT %s
+                OFFSET %s
+            """
+        
+        params.append(limit)
+        params.append(offset)
+
+        self.cursor.execute(query, tuple(params))
+        return self.cursor.fetchall()
