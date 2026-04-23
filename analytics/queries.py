@@ -1,4 +1,6 @@
 import datetime
+from fastapi import HTTPException
+
 class AnalyticsService:
 
     def __init__(self, db):
@@ -11,17 +13,11 @@ class AnalyticsService:
         raw_logs = self.db.fetch_logs(starttime,endtime,"ERROR")
         return raw_logs
 
-    def get_login_counts_per_user(self,limit, hours, service, status, order, offset):
+    def get_login_counts_per_user(self,limit, hours, service, status, last_user_count, last_user_id):
         char_hours = str(hours) + " hours"
-        temp = ["ASC", "DESC"]
-        if order is None:
-            validated_order = "DESC"
-        else:
-            if order.upper() not in temp:
-                validated_order = "DESC"
-            else:
-                validated_order = order.upper()
-        return self.db.get_counts_grouped_by_user("login",char_hours,service,status,validated_order,limit,offset)
+        if (last_user_count is None) != (last_user_id is None):
+            raise HTTPException(status_code=400, detail="Invalid cursor")
+        return self.db.get_counts_grouped_by_user("login",char_hours,service,status,last_user_count, last_user_id,limit)
 
     def get_error_rate(self):
         total_logs = self.db.get_total_log_count()        

@@ -17,4 +17,6 @@ class Generator:
                 file.write(returnline + "\n")
 
 
-    
+if __name__ == "__main__":
+    gen = Generator()
+    gen.Generate_Logs(1000)
