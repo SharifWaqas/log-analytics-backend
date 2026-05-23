@@ -120,10 +120,13 @@ log-engine/
 ├── models/
 ├── parser/
 ├── storage/
+├── assets/
+├── sample_data/
 │
 ├── app.py
-├── Main.py
-└── logs.txt
+├── main.py
+├── requirements.txt
+└── README.md
 ```
 
 ---
@@ -142,13 +145,51 @@ pip install -r requirements.txt
 python -m uvicorn api.server:app --reload
 ```
 
-## 3. Start Log Sender
+## 3. Start Synthetic Traffic Generator
 
 ```bash
 python -m ingestion.sender
 ```
 
+After starting the FastAPI server, open:
+
+```text
+http://127.0.0.1:8000/docs
+```
+<p align="center">
+  <img src="assets/swagger-ui.jpeg" width="850" alt="Swagger UI Documentation">
+</p>
+
+This launches the interactive Swagger UI where you can:
+- test ingestion endpoints
+- query analytics endpoints
+- inspect request/response schemas
+- explore API functionality directly from the browser
 ---
+## Sample Analytics Response
+
+```json
+{
+  "logs_per_second": 142,
+  "queue_size": 18,
+  "error_rate": 0.03
+}
+```
+## Example Analytics Endpoints
+
+```text
+GET /stats/logs-per-second
+GET /stats/queue-size
+GET /stats/error-rate
+GET /stats/top-users
+GET /stats/failed-logins
+```
+
+Example:
+
+```text
+http://127.0.0.1:8000/stats/top-users
+```
 
 # Key Concepts Explored
 
@@ -175,6 +216,6 @@ python -m ingestion.sender
 
 ---
 
-# Motivation
+# Learning Goals
 
 This project was built as a hands-on way to learn backend systems engineering by designing and implementing infrastructure-focused systems from scratch rather than relying solely on tutorials or simple CRUD applications.
