@@ -1,5 +1,5 @@
 from models import log_data
-from parse_result import result
+from parser.parse_result import result
 class LogParser:    
     def valid_input(self, dataVal, DataKey):
         tempVal = dataVal.split("=")

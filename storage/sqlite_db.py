@@ -68,3 +68,30 @@ class SQLiteDB:
         self.cursor.execute(query, (action,))
         returnval = self.cursor.fetchall()
         return (returnval)
+
+    def get_total_log_count(self):
+        query = """
+                SELECT COUNT(*) FROM valid_logs 
+                """
+        self.cursor.execute(query)
+        row = self.cursor.fetchone()
+        return int(row[0])
+    
+    def get_error_log_count(self):
+        query = """
+                SELECT COUNT(*) FROM valid_logs WHERE level = "ERROR" 
+                """
+        self.cursor.execute(query)
+        temp = self.cursor.fetchone()
+        return int(temp[0])
+    
+    def get_failed_login_counts_per_user(self):
+        query = """
+                SELECT user_id, COUNT(*) AS failure_count
+                FROM valid_logs 
+                WHERE action = 'login' AND status IN (401, 500, 503)
+                GROUP BY user_id
+                ORDER BY failure_count DESC;
+                """
+        self.cursor.execute(query)
+        return(self.cursor.fetchall())
