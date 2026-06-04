@@ -1,3 +1,5 @@
+import threading
+
 class Queue:
 
     def __init__(self):
@@ -6,40 +8,45 @@ class Queue:
         self.__tailpointer = 0
         self.__MAX_SIZE = 10000
         self.__numberoflogs = 0
+        self.__lock = threading.Lock()
 
     def enqueue(self, data):
-        if self.__numberoflogs >= self.__MAX_SIZE:
-            return False
+        with self.__lock:
+            if self.__numberoflogs >= self.__MAX_SIZE:
+                return False
 
-        self.__Queue[self.__tailpointer] = data
-        self.__tailpointer += 1
-        if self.__tailpointer == self.__MAX_SIZE:
-            self.__tailpointer = 0
+            self.__Queue[self.__tailpointer] = data
+            self.__tailpointer += 1
+            if self.__tailpointer == self.__MAX_SIZE:
+                self.__tailpointer = 0
 
-        self.__numberoflogs += 1
-        return True
+            self.__numberoflogs += 1
+            return True
 
     def dequeue(self):
-        if self.__numberoflogs == 0:
-            return None
+        with self.__lock:
+            if self.__numberoflogs == 0:
+                return None
 
-        value = self.__Queue[self.__headpointer]
-        self.__Queue[self.__headpointer] = None
-        self.__headpointer += 1
+            value = self.__Queue[self.__headpointer]
+            self.__Queue[self.__headpointer] = None
+            self.__headpointer += 1
 
-        if self.__headpointer == self.__MAX_SIZE:
-            self.__headpointer = 0
+            if self.__headpointer == self.__MAX_SIZE:
+                self.__headpointer = 0
 
-        self.__numberoflogs -= 1
-        return value
+            self.__numberoflogs -= 1
+            return value
     
     def get_number_of_logs(self):
-        return self.__numberoflogs
+        with self.__lock:
+            return self.__numberoflogs
 
     def peek(self):
-        if self.__numberoflogs == 0:
-            return None
+        with self.__lock:
+            if self.__numberoflogs == 0:
+                return None
 
-        return self.__Queue[self.__headpointer]
+            return self.__Queue[self.__headpointer]
 
 

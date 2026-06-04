@@ -1,9 +1,18 @@
 import psycopg2
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+databasename = os.getenv("DB_NAME")
+databaseuser = os.getenv("DB_USER")
+databasepassword = os.getenv("DB_PASSWORD")
+databasehost = os.getenv("DB_HOST")
+databaseport = os.getenv("DB_PORT")
 
 class PostgreSQLDB:
 
     def __init__(self):
-        self.connection = psycopg2.connect(database="log_engine", user="postgres", password="Z7@pL3!xQ9#tV2$k", host="localhost",port=5432)
+        self.connection = psycopg2.connect(database=databasename, user=databaseuser, password=databasepassword, host=databasehost,port=databaseport)
         self.cursor = self.connection.cursor()
 
 

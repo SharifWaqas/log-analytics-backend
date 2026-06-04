@@ -44,12 +44,27 @@ def recieve_log(log: dict):
     else:
         raise HTTPException(status_code=400, detail={"missing_Field": missing_fields})
 
+@app.get("/stats/total-logs")
+def total_logs():
+    return {
+        "total_logs": metric_object.total_processed_logs,
+        "recent_logs": metric_object.recent_logs
+    }
+
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
+
 
 @app.get("/stats/logs-per-second")
 def logs_per_second():
-    elapsed_time = time.time() - metric_object.rate_start_time
-    result = metric_object.total_processed_logs / elapsed_time
-    return {"Logs-per-second": round(result,2)}
+    elapsed_time = time.time() - metric_object.last_reset_time
+    if elapsed_time == 0:
+        return {"Logs-per-second": 0}
+    result = metric_object.recent_logs / elapsed_time
+    metric_object.recent_logs = 0
+    metric_object.last_reset_time = time.time()
+    return {"Logs-per-second": round(result, 2)}
 
 @app.get("/stats/queue-size")
 def queue_size():

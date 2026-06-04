@@ -5,3 +5,5 @@ venv/
 .vscode/
 .idea/
 *.db
+.env
+Logs.txt

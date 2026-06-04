@@ -19,4 +19,4 @@ class Generator:
 
 if __name__ == "__main__":
     gen = Generator()
-    gen.Generate_Logs(1000)
+    gen.Generate_Logs(10000)
